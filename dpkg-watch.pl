@@ -9,11 +9,16 @@ logMon() if !$daemon;
 $SIG{USR1}='parseRow';
 
 
-get '/' => sub { shift->render(json => $tbl) };
+get '/data.json' => sub {
+    my @list = map  {$tbl->{$_}}
+               sort {$tbl->{$b}->{'updated'} cmp $tbl->{$a}->{'updated'}} keys %{$tbl};
+
+    shift->render(json => [ @list[0 .. ($#list>99?99:$#list) ] ]);
+};
+
+get '/' => sub { shift->render(template => 'index') };
 
 app->start('daemon', '-l', 'http://*:3000');
-
-
 
 
 sub logMon {
@@ -51,6 +56,7 @@ sub parseRow {
     while($i--){
 	my @r = split/[|\n]/,<$dpkg>;
 	$tbl->{$r[4]} = {
+	    pkgname=> $r[4],
 	    status => $r[3],
 	    version=> $r[5],
 	    updated=> $r[0].' '.$r[1]
@@ -59,3 +65,45 @@ sub parseRow {
     $SIG{USR1}='parseRow';
     kill 'SIGUSR2', $daemon;
 }
+
+
+__DATA__
+@@ index.html.ep
+<html>
+<head>
+<title>dpkg monitor</title>
+<style>
+.installed     {color: green  }
+.removed       {color: red    }
+.not-installed {color: orange }
+.head { font-weight: bold; }
+</style>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript">
+function puts(txt,len,atr){
+  txt=txt.substring(0,len);
+  return '  |  <a '+atr+'>'+txt+'</a>' + " ".repeat(Math.max(len-txt.length,0))
+}
+function fetch(){
+  $.ajax('/data.json',{
+    success: function(data){
+      $("#view").empty();
+      $("#view").append(
+             puts('STATUS',      15, 'class="head"')+
+             puts('PACKAGE NAME',35, 'class="head"')+
+             puts('VERSION',     20, 'class="head"')+
+             puts('UPDATED',     19, 'class="head"')+"  |\n");
+
+      $.each(data,function(idx,r){
+        $("#view").append(
+               puts(r.status,  15, 'class="'+r.status+'"')+
+               puts(r.pkgname, 35)+
+               puts(r.version.replace(/[><]/g,'-'), 20)+
+               puts(r.updated, 19)+"  |\n");
+      });
+    }
+  })
+}
+
+$(document).ready(fetch());
+</script></head><body><pre id="view" /></body></html>
