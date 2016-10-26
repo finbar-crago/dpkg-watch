@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use Mojolicious::Lite;
-my $tbl={};
+my $tbl={}; my $subs={};
 
 my $parent = $$;
 my $daemon = open(my $dpkg, '-|');
@@ -14,6 +14,15 @@ get '/data.json' => sub {
                sort {$tbl->{$b}->{'updated'} cmp $tbl->{$a}->{'updated'}} keys %{$tbl};
 
     shift->render(json => [ @list[0 .. ($#list>99?99:$#list) ] ]);
+};
+
+websocket '/sub' => sub {
+    my $self = shift;
+    $self->inactivity_timeout(300);
+    $subs->{sprintf"%s",$self->tx}=$self->tx;
+    $self->tx->send('!');
+    $self->on(message => sub { $self->tx->send('~'); });
+    $self->on(finish => sub { delete $subs->{sprintf"%s",$self->tx}});
 };
 
 get '/' => sub { shift->render(template => 'index') };
@@ -62,6 +71,7 @@ sub parseRow {
 	    updated=> $r[0].' '.$r[1]
 	}
     }
+    $subs->{$_}->send('!') for keys %{$subs};
     $SIG{USR1}='parseRow';
     kill 'SIGUSR2', $daemon;
 }
@@ -102,8 +112,14 @@ function fetch(){
                puts(r.updated, 19)+"  |\n");
       });
     }
-  })
+  });
 }
-
-$(document).ready(fetch());
+$(document).ready($(function(){
+  var ws = new WebSocket('ws://'+window.location.host+'/sub');
+  ws.onopen = function(){ };
+  ws.onerr = function(){ window.location.reload(false) };
+  ws.onclose = function(){ window.location.reload(false) };
+  ws.onmessage = function(msg){ if(msg.data == "!"){ fetch() }};
+  window.setInterval(function(){ws.send('~')}, 1500);
+}));
 </script></head><body><pre id="view" /></body></html>
