@@ -8,7 +8,6 @@ die "fork(): $!" unless defined $daemon;
 logMon() if !$daemon;
 $SIG{USR1}='parseRow';
 
-
 get '/data.json' => sub {
     my @list = map  {$tbl->{$_}}
                sort {$tbl->{$b}->{'updated'} cmp $tbl->{$a}->{'updated'}} keys %{$tbl};
@@ -26,7 +25,6 @@ websocket '/sub' => sub {
 };
 
 get '/' => sub { shift->render(template => 'index') };
-
 app->start('daemon', '-l', 'http://*:3000');
 
 
@@ -54,10 +52,8 @@ sub logMon {
 	select(undef, undef, undef, 0.05)while($wait);
 	select(undef, undef, undef, 0.05);
     }
-
-    close $log
+    close $log;
 }
-
 
 sub parseRow {
     $SIG{USR1}='IGNORE';
@@ -76,11 +72,9 @@ sub parseRow {
     kill 'SIGUSR2', $daemon;
 }
 
-
 __DATA__
 @@ index.html.ep
-<html>
-<head>
+<html><head>
 <title>dpkg monitor</title>
 <style>
 .installed     {color: green  }
@@ -92,8 +86,8 @@ __DATA__
 <script type="text/javascript">
 function puts(txt,len,atr){
   txt=txt.substring(0,len);
-  return '  |  <a '+atr+'>'+txt+'</a>' + " ".repeat(Math.max(len-txt.length,0))
-}
+  return '  |  <a '+atr+'>'+txt+'</a>' + " ".repeat(Math.max(len-txt.length,0))}
+
 function fetch(){
   $.ajax('/data.json',{
     success: function(data){
@@ -114,9 +108,9 @@ function fetch(){
     }
   });
 }
+
 $(document).ready($(function(){
   var ws = new WebSocket('ws://'+window.location.host+'/sub');
-  ws.onopen = function(){ };
   ws.onerr = function(){ window.location.reload(false) };
   ws.onclose = function(){ window.location.reload(false) };
   ws.onmessage = function(msg){ if(msg.data == "!"){ fetch() }};
