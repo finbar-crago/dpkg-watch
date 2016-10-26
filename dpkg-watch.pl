@@ -22,8 +22,7 @@ sub logMon {
     $SIG{TERM}=sub{$run=0};
     $SIG{USR2}=sub{$wait=0};
 
-    # LIVE: /var/log/dpkg.log
-    open my $log, '<', 'test.log' or die $!;
+    open my $log, '<', '/var/log/dpkg.log' or die $!;
     while($run){
 	seek($log, 0, 1);
 	my @buf=();
@@ -32,13 +31,14 @@ sub logMon {
 	    my @r = split/ /;
 	    next unless $#r == 5 && $r[2] eq 'status';
 	    push @buf, join '|', @r;
+	    last if $#buf > 100;
 	} if (@buf) {
 	    print $#buf+1, @buf;
 	    kill 'SIGUSR1', $parent;
 	    $wait=1;
 	} else { $wait=0 }
-	select(undef, undef, undef, 0.25)while($wait);
-	select(undef, undef, undef, 0.25);
+	select(undef, undef, undef, 0.05)while($wait);
+	select(undef, undef, undef, 0.05);
     }
 
     close $log
