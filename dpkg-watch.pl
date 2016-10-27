@@ -78,8 +78,8 @@ __DATA__
 <title>dpkg monitor</title>
 <style>
 .installed     {color: green  }
-.removed       {color: red    }
-.not-installed {color: orange }
+.not-installed {color: red    }
+.config-files  {color: orange }
 .head { font-weight: bold; }
 </style>
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
