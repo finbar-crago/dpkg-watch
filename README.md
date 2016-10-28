@@ -2,7 +2,7 @@
 
 This is a utitly that monitors in realtime packages as thay are added and removed from the system.
 
-![Photo](https://raw.githubusercontent.com/finbar-crago/dpkg-watch/add-img/screen.png)
+![Photo](https://raw.githubusercontent.com/finbar-crago/dpkg-watch/master/screen.png)
 
 + Information is displayed to the user in browser as fixed width text fetched via ajax.
 + A web socket notifies the browser when changes have occurred.
@@ -20,7 +20,7 @@ vagrant@jessie:~$ sudo apt-get remove emacs24-nox
 vagrant@jessie:~$ sudo apt-get autoremove
 ```
 
-### A Lazy Alternative...
+### Lazy Alternative...
 ```perl
 use IO::All; $,="\r\n";
 $s=io(":3001")->fork->accept;
