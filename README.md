@@ -2,7 +2,7 @@
 
 This is a utitly that monitors in realtime packages as thay are added and removed from the system.
 
-![Photo](https://lh3.googleusercontent.com/sugCwKvGgVJyD1t8ZzUnfjC7SX4T5PrY0gpc5A7BSY32adkA1Qy7qmjSVqJ9CesL-Jo9Rvph5cExSHWoPWJKvfUXMcf6Y9F3xvFRTZELPhg5dW737hfCOfSEST-nkoNrOTs8T3aJzCsZqeDPNyTgOsmVGUwVEjxrRSbidRvKOdYlbTXeLVu66dwRft1qjKr-1aewx4DwZXE0oSE1z448MQXh_pPXuFCESC02MPrO7dM0r_ZKUJuMMFPc2nUzDz1NsCBZlxDJ56Rzsf7eZOKOqaPv6uFzorq9B8aoA4nWohGFc3N70mxRYy_LH_k3Dq-E4D3Tbt_T_gk5jk8HWndBrOVxuvYaApT4j5AVTA2yCoAgmuOxmOXUEtk0ejrqg-2QE_BzRmfunXutevPcDlK2p7601fLakXlnq0KPgStGsc-fe3gQW2ZrgV5NK7t9KVdxdg2B2WZTvrKVK2L-1pAoNifYUXJOHMdGuZv8wVDAasdPJNyxJSBIx8SHouOavX7PQv7GdmUQXNQzKg_Vm1XQ-hoUAqR_3Z0Amq6_40gzKz3MmfQ8DaHdPm-H3ZMsF6pA7MyD8r6tYluIy11RqorpGZqgigQMT7fmSdAkDkoEm67DBTNh=w944-h683-no)
+![Photo](https://raw.githubusercontent.com/finbar-crago/dpkg-watch/add-img/screen.png)
 
 + Information is displayed to the user in browser as fixed width text fetched via ajax.
 + A web socket notifies the browser when changes have occurred.
