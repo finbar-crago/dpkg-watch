@@ -8,26 +8,6 @@ die "fork(): $!" unless defined $daemon;
 logMon() if !$daemon;
 $SIG{USR1}='parseRow';
 
-get '/data.json' => sub {
-    my @list = map  {$tbl->{$_}}
-               sort {$tbl->{$b}->{'updated'} cmp $tbl->{$a}->{'updated'}} keys %{$tbl};
-
-    shift->render(json => [ @list[0 .. ($#list>99?99:$#list) ] ]);
-};
-
-websocket '/sub' => sub {
-    my $self = shift;
-    $self->inactivity_timeout(300);
-    $subs->{sprintf"%s",$self->tx}=$self->tx;
-    $self->tx->send('!');
-    $self->on(message => sub { $self->tx->send('~'); });
-    $self->on(finish => sub { delete $subs->{sprintf"%s",$self->tx}});
-};
-
-get '/' => sub { shift->render(template => 'index') };
-app->start('daemon', '-l', 'http://*:3000');
-
-
 sub logMon {
     $\="\n";$,="\n";
     my $run=1; my $wait=0;
@@ -71,6 +51,29 @@ sub parseRow {
     $SIG{USR1}='parseRow';
     kill 'SIGUSR2', $daemon;
 }
+
+
+#
+# --- HTTP STUFF ---
+#
+get '/data.json' => sub {
+    my @list = map  {$tbl->{$_}}
+               sort {$tbl->{$b}->{'updated'} cmp $tbl->{$a}->{'updated'}} keys %{$tbl};
+
+    shift->render(json => [ @list[0 .. ($#list>99?99:$#list) ] ]);
+};
+
+websocket '/sub' => sub {
+    my $self = shift;
+    $self->inactivity_timeout(300);
+    $subs->{sprintf"%s",$self->tx}=$self->tx;
+    $self->tx->send('!');
+    $self->on(message => sub { $self->tx->send('~'); });
+    $self->on(finish => sub { delete $subs->{sprintf"%s",$self->tx}});
+};
+
+get '/' => sub { shift->render(template => 'index') };
+app->start('daemon', '-l', 'http://*:3000');
 
 __DATA__
 @@ index.html.ep
